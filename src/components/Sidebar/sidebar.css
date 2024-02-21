@@ -1,0 +1,93 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-title {
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.sidebar-tools {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    gap: 25px;
+}
+
+.tool {
+    background: #252525;
+    color: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: ease-in-out 500ms;
+}
+
+.tool:hover {
+    transform: scale(1.1);
+}
+
+.tool label {
+    cursor: pointer;
+}
+
+.tool-upload {
+    border-top: 1px solid #000;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    cursor: pointer;
+    color: white;
+    position: absolute;
+    bottom: 0;
+}
+
+.tool-upload span {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.btn-remove {
+    background: transparent;
+    border: none;
+    color: white;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.remove-icon {
+    margin-right: 10px;
+}
+
+.tool-btn {
+    background: black;
+    position: absolute;
+    bottom: 70px;
+    max-width: 160px;
+    width: 100%;
+    transition: 500ms;
+}
+
+.tool-export {
+    background: transparent;
+    cursor: pointer;
+    color: white;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 50px;
+}
+
+.tool-btn:hover {
+    transform: scale(1.1);
+}

@@ -1,0 +1,16 @@
+.video-div {
+    /* max-height: 500px; */
+    overflow: hidden;
+    object-fit: contain;
+    position: relative;
+    
+}
+
+.no-video {
+    text-align: center;
+    color: white;
+    font-size: 40px;
+    margin-top: 80px;
+}
+
+

@@ -1,0 +1,15 @@
+.main-page {
+    display: flex;
+}
+
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    display: flex;
+    background: #58585874;
+    flex-direction: column;
+}
+
+.video {
+    flex: 1;
+}

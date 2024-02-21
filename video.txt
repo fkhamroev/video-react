@@ -1,0 +1,26 @@
+import React from "react";
+import "./Video.css";
+import { Player, ControlBar, BigPlayButton } from "video-react";
+import "video-react/dist/video-react.css";
+
+type Props = {
+  videoFile: File | null;
+};
+
+const Video: React.FC<Props> = ({ videoFile }) => {
+  return (
+    <section className="video-div">
+      {videoFile ? (
+        <Player fluid={false} height={500} width="100%">
+          <source src={URL.createObjectURL(videoFile)} type="video/mp4" />
+          <ControlBar autoHide={true} disableCompletely={false} />
+          <BigPlayButton position="center" />
+        </Player>
+      ) : (
+        <div className="no-video">No video uploaded</div>
+      )}
+    </section>
+  );
+};
+
+export default Video;
