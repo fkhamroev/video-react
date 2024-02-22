@@ -1,56 +1,78 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import "./Video.css";
-import { Player, ControlBar, BigPlayButton } from "video-react";
-import "video-react/dist/video-react.css";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
 
 type Props = {
   videoFile: File | null;
 };
 
 const Video: React.FC<Props> = ({ videoFile }) => {
-  const [videoDimensions, setVideoDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ffmpeg = new FFmpeg();
 
-  const handleMetadata = (e) => {
-    const { videoWidth, videoHeight } = e.target;
-    setVideoDimensions({ width: videoWidth, height: videoHeight });
+  const videoTrim = async () => {
+    if (!videoFile) return;
+
+    await ffmpeg.load();
+    ffmpeg.FS("writeFile", "input.mp4", await fetchFile(videoFile));
+    await ffmpeg.run("-i", "input.mp4", "-ss", "00:00:03", "-to", "00:00:10", "-c", "copy", "output.mp4");
+    const data = ffmpeg.FS("readFile", "output.mp4");
+    const blob = new Blob([data.buffer], { type: "video/mp4" });
+    const url = URL.createObjectURL(blob);
+    const videoElement = document.createElement("video");
+    videoElement.src = url;
+    videoElement.controls = true;
+    document.body.appendChild(videoElement);
+    videoElement.play(); // Воспроизведение видео после обработки
+  };
+
+  const fetchFile = async (file: File) => {
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      reader.onerror = reject;
+      reader.onload = () => {
+        resolve(new Uint8Array(reader.result as ArrayBuffer));
+      };
+      reader.readAsArrayBuffer(file);
+    });
   };
 
   useEffect(() => {
-    if (canvasRef.current && videoDimensions.width && videoDimensions.height) {
-      const canvas = canvasRef.current;
-      canvas.width = videoDimensions.width;
-      canvas.height = videoDimensions.height;
-      canvas.style.width = "100%";
-      canvas.style.height = "auto";
-    }
-  }, [videoDimensions]);
+    if (!videoFile || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+
+    const video = document.createElement('video');
+
+    video.addEventListener('loadedmetadata', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      video.play(); // Воспроизведение видео после загрузки
+      drawFrame();
+    });
+
+    const drawFrame = () => {
+      if (video.paused || video.ended) return;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      requestAnimationFrame(drawFrame);
+    };
+
+    video.src = URL.createObjectURL(videoFile);
+    video.autoplay = true;
+
+    return () => {
+      URL.revokeObjectURL(video.src);
+    };
+  }, [videoFile]);
 
   return (
     <section className="video-div">
       <div className="video">
-        {videoFile ? (
-          <Player fluid={false} height={500} width="100%">
-            <source src={URL.createObjectURL(videoFile)} type="video/mp4" />
-            <ControlBar autoHide={true} disableCompletely={false} />
-            <BigPlayButton position="center" />
-            <video
-              onLoadedMetadata={handleMetadata}
-              style={{ display: "none" }}
-            ></video>
-          </Player>
-        ) : (
-          <div className="no-video">No video uploaded</div>
-        )}
-        <canvas
-          ref={canvasRef}
-          id="c"
-          className="canvas"
-          style={{ position: "absolute", top: 0, left: 0, zIndex: 2 }}
-        ></canvas>
+        <canvas ref={canvasRef} id="c" className="canvas"></canvas>
+        {videoFile && <button onClick={videoTrim}>Trim Video</button>}
       </div>
     </section>
   );
